@@ -18,19 +18,9 @@
             </a>
         </header>
         <div class="container">
-            <div class="table-header" name="{{cam.name}}">
-                <p style="float:left;">Adding a Video to {{cam.name}}</p>
+            <div>
+                <p>Not sure how to let the user draw...</p>
             </div>
-            <form action="/cam/{{cam.cam_id}}/addVideo/success" method="POST" enctype="multipart/form-data">
-                <div class="wrapper">
-                    <p>Upload Video*:</p>
-                    <input type="file" id="image-upload" accept="*" name="videofile" required>
-                    <p>Name for the video*:</p>
-                    <input type="text" name="vname" placeholder="Name*" required>
-                </div>
-                <a class="button" href="/cam/{{cam.cam_id}}" style="display: inline;">Back</a>
-                <button type="submit" class="button submit" style="display: inline;">Done</button>
-            </form>
         </div>
     </body>
 </html>

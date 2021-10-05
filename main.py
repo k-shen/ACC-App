@@ -130,6 +130,25 @@ def addVideoSuccess(cid):
     print("added video" + vname + " of camera id " + str(cid))
     return flask.redirect('/cam/{}'.format(cid))
 
+@app.route("/addCamera", methods=['GET', "POST"])
+def addCamera():
+    return flask.render_template("addCamera.html")
+
+@app.route("/drawbox", methods=['GET', "POST"])
+def drawBox():
+    return flask.render_template('drawbox.html')
+
+
+@app.route("/cam/<cid>/draw", methods=['GET', "POST"])
+def redrawBox(cid):
+    conn = sqlite.connect('./data/database.db')
+    c = conn.cursor()
+    cam_info = (c.execute("select * from Cameras where cam_id=?",(cid,)).fetchone())
+    conn.commit()
+    conn.close()
+    cam = loadTempCamera(cam_info)
+
+    return flask.render_template('redraw.html', cam=cam)
 
 if __name__ == '__main__':
     app.run(port=8001, host='127.0.0.1',debug=True, use_evalex=False,use_reloader=True)

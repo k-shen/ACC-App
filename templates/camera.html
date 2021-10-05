@@ -21,7 +21,9 @@
             <div class="table-header" name="{{cam.name}}">
                 <p style="float:left;">{{cam.name}}</p>
                 <button cid="{{cam.cam_id}}" class="button delete-cam-button">-</button>
-                <button cid="{{cam.cam_id}}" class="button redraw-button">Redraw</button>
+                <form action="/cam/{{cam.cam_id}}/draw" style="display: inline;">
+                    <input type="submit" value="Redraw" class="button"/>
+                </form>
                 <form action="/cam/{{cam.cam_id}}/addVideo" style="display: inline;">
                     <input type="submit" value="+" class="button"/>
                 </form>

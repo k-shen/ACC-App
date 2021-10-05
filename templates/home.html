@@ -19,7 +19,10 @@
         </header>
         <div class="container">
             <div class="table-header">
-                <p>Existing Cameras</p>
+                <p style="display: inline;">Existing Cameras</p>
+                <form action="/addCamera" style="display: inline;">
+                    <input type="submit" value="+" class="button"/>
+                </form>
             </div>
             <div class="table">
                 {% for cam in cam_list: %}

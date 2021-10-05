@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+        <link rel="stylesheet" href="/styles/styles.css" type="text/css" href="{{ url_for('static',filename='styles/styles.css') }}"/>
+        <script src="https://kit.fontawesome.com/d22acbefa1.js" crossorigin="anonymous"></script>
+        <script src="{{ url_for('static',filename='scripts/script.js') }}"></script>
+        <title>ACC</title>
+    </head>
+    <body>
+        <header>
+            <a class="home" href="/home">
+                ACC Home
+            </a>
+        </header>
+        <div class="container">
+            <div class="table-header" name="{{cam.name}}">
+                <p style="float:left;">Adding a Video to camera angle ({{cam.name}})</p>
+            </div>
+            <form action="/cam/{{cam.cam_id}}/addVideo/success" method="POST" enctype="multipart/form-data">
+                <div class="wrapper">
+                    <p>Upload Video*:</p>
+                    <input type="file" id="image-upload" accept="image/*" name="videofile" required>
+                    <p>Name for the video*:</p>
+                    <input type="text" name="vname" placeholder="Name*" required>
+                </div>
+                <button type="submit" class="button submit">Done</button>
+            </form>
+            <a class="button" href="/cam/{{cam.cam_id}}">Back</a>
+        </div>
+    </body>
+</html>
+

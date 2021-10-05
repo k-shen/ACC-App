@@ -1,0 +1,82 @@
+@import url('https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Kiwi+Maru&family=Roboto&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lexend&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Zen+Dots&display=swap');
+
+html {
+    background: linear-gradient(rgba(0,212,255,1), rgba(255,255,255,1));
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+}
+
+body {
+    background: transparent;
+}
+
+header {
+    background-color: #5683F6;
+    height: 30pt;
+    padding-left: 2%;
+    padding-top: 10pt;
+}
+
+a.home:link {
+    text-decoration: none;
+    color: white;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+a.home:visited {
+    text-decoration: none;
+    color: white;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+a.home:hover {
+    text-decoration: underline;
+    color: white;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+a.home:active {
+    text-decoration: none;
+    color: white;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+.container {
+    margin-top: 10%;
+    height: 400px;
+    width: 85%;
+    box-shadow: 5px 5px 10px rgba(0,0,0,0.5);
+    background-color: white;
+}
+
+.table{
+    display: inline-block;
+}
+
+.row {
+    width: 80%;
+    display: inline-block;
+}
+
+.row-label {
+    display: inline;
+}
+
+.button {
+    display:inline;
+    float: inline-end;
+    width: 60px;
+    height: 30px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.table-header{
+    display: inline-block;
+}

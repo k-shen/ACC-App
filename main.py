@@ -138,17 +138,52 @@ def addCamera():
 def drawBox():
     return flask.render_template('drawbox.html')
 
+@app.route("/frames", methods=['GET', 'POST'])
+def queryInit():
+    conn = sqlite.connect('./data/database.db')
+    c = conn.cursor()
+    zones = (c.execute("select * from Zones").fetchall())
+    conn.commit()
+    conn.close()
+    return flask.render_template('query.html', zones=zones, frames=[])
+
+@app.route("/frames/query", methods=['GET', 'POST'])
+def query():
+    zones = request.form.getlist('zones')
+    conn = sqlite.connect('./data/database.db')
+    c = conn.cursor()
+    z_str = "({});".format(",".join(zones))
+    frames = c.execute("select frame_num, video_id, f.cam_id, f.zone_id, time_stamp from Frames f left join Zones z on f.zone_id = z.zone_id where z.zone_id in {}".format(z_str)).fetchall()
+    zones = (c.execute("select * from Zones").fetchall())
+    conn.commit()
+    conn.close()
+    return flask.render_template('query.html', zones=zones, frames=frames)
 
 @app.route("/cam/<cid>/draw", methods=['GET', "POST"])
 def redrawBox(cid):
     conn = sqlite.connect('./data/database.db')
     c = conn.cursor()
+    # what does this (cid,) mean ? cid is the variable passed in
     cam_info = (c.execute("select * from Cameras where cam_id=?",(cid,)).fetchone())
     conn.commit()
     conn.close()
     cam = loadTempCamera(cam_info)
 
     return flask.render_template('redraw.html', cam=cam)
+
+# does this look right?
+# cid is what i used for camera id and idt we will need it here right now
+# can you motify the /frames/query function? yupp
+# i need to first test if i can get the forms info like that hence the print statements lol
+
+
+# @app.route("/frames/<cid>", methods=['GET'])
+# def getFrames(cid):
+#     conn = sqlite.connect('./data/database.db')
+#     c = conn.cursor()
+#     frame_tups = list(c.execute("select * from Frames f join Zones z on f.zone_id = z.zone_id where z.zone_name =?",(cid)).fetchall())
+#     conn.close()
+#     return frame_tups
 
 if __name__ == '__main__':
     app.run(port=8001, host='127.0.0.1',debug=True, use_evalex=False,use_reloader=True)

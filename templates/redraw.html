@@ -23,6 +23,20 @@
             </div>
             <div>
                 <p>Not sure how to let the user draw...</p>
+                <form action="/cam/{{cam.cam_id}}/draw_success" method="POST" enctype="multipart/form-data">
+                    <div class="wrapper">
+                        <p>Enter a name for this zone:</p>
+                        <input type="text" name="zname" placeholder="name" required>
+                        <p>Top left coordinate*:</p>
+                        <input type="text" name="top_left_x" placeholder="X" required>
+                        <input type="text" name="top_left_y" placeholder="Y" required>
+                        <p>Bottom right coordinate*:</p>
+                        <input type="text" name="bot_right_x" placeholder="X" required>
+                        <input type="text" name="bot_right_y" placeholder="Y" required>
+                    </div>
+                    <a class="button" href="/cam/{{cam.cam_id}}" style="display: inline;">Back</a>
+                    <button type="submit" class="button submit" style="display: inline;">Done</button>
+                </form>
             </div>
         </div>
     </body>

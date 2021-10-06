@@ -26,6 +26,7 @@ create table Videos
 create table Frames
             (
                 frame_id integer primary key,
+                frame_num integer not null,
                 video_id integer not null,
                 cam_id integer not null,
                 zone_id integer not null,

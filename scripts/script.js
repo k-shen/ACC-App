@@ -34,4 +34,41 @@ $(document).ready(function() {
             });
         }
     });
+    $('.delete-zone-button').on('click',function(){
+        var name = $(this).parent().attr('name');
+        var cid = $(this).parent().parent().attr('cid');
+        if (confirm('Are you sure you want to delete this zone ('+name+')?')){
+            var zid = $(this).attr('zid');
+            $(this).parent().remove();
+            $.ajax({
+                method: "POST",
+                url: "/zone/"+zid+"/delete",
+                data: {
+                    zid: zid,
+                    cid: cid,
+                }
+            });
+        }
+    });
+    $('#switchVZ').on('click', function() {
+        if (document.getElementById('vid_table').style.display == 'none') {
+            document.getElementById('vid_table').style.display = '';
+            document.getElementById('zone_table').style.display = 'none';
+            $(this).text('Zones');
+        } else {
+            document.getElementById('vid_table').style.display = 'none';
+            document.getElementById('zone_table').style.display = '';
+            $(this).text('Video');
+        }
+    });
+
+    $("#adding").on('click', function() {
+        var cid = $(this).attr("cid")
+        console.log(cid)
+        if (document.getElementById('vid_table').style.display == 'none') {
+            $('#adding').attr('action', "/cam/"+cid+"/addZone").submit();
+        } else {
+            $('#adding').attr('action', "/cam/"+cid+"/addVideo").submit();
+        }
+    })
 });

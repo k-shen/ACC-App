@@ -21,21 +21,31 @@
             <div class="table-header" name="{{cam.name}}">
                 <p style="float:left;">{{cam.name}}</p>
                 <button cid="{{cam.cam_id}}" class="button delete-cam-button">-</button>
-                <form action="/cam/{{cam.cam_id}}/draw" style="display: inline;">
-                    <input type="submit" value="Redraw" class="button"/>
-                </form>
-                <form action="/cam/{{cam.cam_id}}/addVideo" style="display: inline;">
+                <form id="adding" cid="{{cam.cam_id}}" style="display: inline;">
                     <input type="submit" value="+" class="button"/>
                 </form>
             </div>
-            <div class="table" cid="{{cam_id}}">
-                {% for vid in data: %}
-                    <div class="row" name="{{vid.name}}">
+            <div class="table" cid="{{cam_id}}" id="vid_table">
+                {% for vid in vdata: %}
+                    <div class="row" id="video_row" name="{{vid.name}}">
                         <p class="row-label">{{ vid.name }}</p>
                         <button vid="{{vid.vid_id}}" class="button delete-vid-button">delete</button>
                     </div>
                 {% endfor %}
             </div>
+            <div class="table" cid="{{cam_id}}" id="zone_table" style="display: none;">
+                {% for zone in zdata: %}
+                    <div class="row"  name="{{zone.name}}">
+                        <p class="row-label">{{ zone.name }}</p>
+                        <form action="/cam/{{cam.cam_id}}/{{zone.zone_id}}/draw" style="display: inline;">
+                            <input type="submit" value="Redraw" class="button"/>
+                        </form>
+                        <button zid="{{zone.zone_id}}" class="button delete-zone-button">delete</button>
+                    </div>
+                {% endfor %}
+            </div>
+            <a class="button" href="/" style="display: inline;">Back</a>
+            <button class="button" id="switchVZ">Zones</button>
         </div>
     </body>
 </html>

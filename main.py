@@ -30,7 +30,6 @@ def show():
     return flask.render_template('home.html', cam_list=cam_list)
 
 def loadTempCamera(data):
-    print(data)
     cam = Camera(data[0], data[1], [])
     
     return cam
@@ -81,21 +80,39 @@ def deleteVid(vid):
     cid = request.form['cid']
     return flask.redirect('/cam/{}'.format(cid))
 
+@app.route('/zone/<zid>/delete', methods=['POST'])
+def deleteZone(zid):
+    #connect to data base
+    conn = sqlite.connect('./data/database.db')
+    c = conn.cursor()
+    idToDelete = request.form['zid']
+    c.execute("delete from Zones where zone_id=?",(idToDelete,))
+    conn.commit()
+    conn.close()
+
+    print("deleted zone id " + str(zid))
+    cid = request.form['cid']
+    return flask.redirect('/cam/{}'.format(cid))
+
 @app.route('/cam/<cid>', methods=['GET', 'POST'])
 def viewCam(cid):
     #connect to data base
     conn = sqlite.connect('./data/database.db')
     c = conn.cursor()
     cam = loadCameraObj(cid)
-    details = (c.execute("select * from Videos where cam_id=?",(cid,)).fetchall())
+    v_details = (c.execute("select * from Videos where cam_id=?",(cid,)).fetchall())
+    z_details = (c.execute("select * from Zones where cam_id=?",(cid,)).fetchall())
     conn.commit()
     conn.close()
 
     videos = []
-    for v in details:
+    zones = []
+    for v in v_details:
         videos.append(loadVideoObj(v))
+    for z in z_details:
+        zones.append(loadZoneObj(z))
 
-    return flask.render_template('camera.html', cam=cam, data=videos)
+    return flask.render_template('camera.html', cam=cam, vdata=videos, zdata=zones)
 
 def loadVideoObj(data):
     return Video(data[0], data[1], data[2], data[3])
@@ -159,8 +176,8 @@ def query():
     conn.close()
     return flask.render_template('query.html', zones=zones, frames=frames)
 
-@app.route("/cam/<cid>/draw", methods=['GET', "POST"])
-def redrawBox(cid):
+@app.route("/cam/<cid>/addZone", methods=['GET', "POST"])
+def addZone(cid):
     conn = sqlite.connect('./data/database.db')
     c = conn.cursor()
     cam_info = (c.execute("select * from Cameras where cam_id=?",(cid,)).fetchone())
@@ -169,6 +186,35 @@ def redrawBox(cid):
     cam = loadTempCamera(cam_info)
 
     return flask.render_template('redraw.html', cam=cam)
+
+
+@app.route("/cam/<cid>/addZone/success", methods=["POST"])
+def addZoneSuccess(cid):
+    zname = flask.request.form['zname']
+    top_left_x = flask.request.form['top_left_x']
+    top_left_y = flask.request.form['top_left_y']
+    bot_right_x = flask.request.form['bot_right_x']
+    bot_right_y = flask.request.form['bot_right_y']
+    conn = sqlite.connect('./data/database.db')
+    c = conn.cursor()
+    c.execute('insert into Zones (zone_name, cam_id, top_left_x, top_left_y, bot_right_x, bot_right_y) values (?, ?, ?, ?, ?, ?);', \
+        (zname, cid, top_left_x, top_left_y, bot_right_x, bot_right_y))
+    conn.commit()
+    conn.close()
+
+    return flask.redirect('/cam/{}'.format(cid))
+
+
+# @app.route("/cam/<cid>/draw", methods=['GET', "POST"])
+# def redrawBox(cid):
+#     conn = sqlite.connect('./data/database.db')
+#     c = conn.cursor()
+#     cam_info = (c.execute("select * from Cameras where cam_id=?",(cid,)).fetchone())
+#     conn.commit()
+#     conn.close()
+#     cam = loadTempCamera(cam_info)
+
+#     return flask.render_template('redraw.html', cam=cam)
 
 @app.route("/cam/<cid>/draw_success", methods=['GET', "POST"])
 def redrawSuccess(cid):

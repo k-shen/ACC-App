@@ -150,5 +150,13 @@ def redrawBox(cid):
 
     return flask.render_template('redraw.html', cam=cam)
 
+@app.route("/frames/<cid>", methods=['GET'])
+def getFrames(cid):
+    conn = sqlite.connect('./data/database.db')
+    c = conn.cursor()
+    frame_tups = list(c.execute("select * from Frames f join Zones z on f.zone_id = z.zone_id where z.zone_name =?",(cid)).fetchall())
+    conn.close()
+    return frame_tups
+
 if __name__ == '__main__':
     app.run(port=8001, host='127.0.0.1',debug=True, use_evalex=False,use_reloader=True)

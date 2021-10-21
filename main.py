@@ -187,6 +187,21 @@ def addZone(cid):
 
     return flask.render_template('redraw.html', cam=cam)
 
+@app.route("/cam/<cid>/<zid>/redraw")
+def drawZone(cid, zid):
+    return flask.render_template('image.html')
+
+@app.route("/cam/<cid>/<zid>/redraw/success")
+def drawZoneSuccess(cid, zid):
+    # top_left_x = flask.request.form['top_left_x']
+    # top_left_y = flask.request.form['top_left_y']
+    # bot_right_x = flask.request.form['bot_right_x']
+    # bot_right_y = flask.request.form['bot_right_y']
+    # conn = sqlite.connect('./data/database.db')
+    # c = conn.cursor()
+    # c.execute("update Zones set top_left_x = ?, top_left_y = ?, bot_right_x = ?, bot_right_y = ? where zone_id =?",(top_left_x, top_left_y, bot_right_x, bot_right_y, zid,))
+    
+    return flask.redirect('/cam/{}'.format(cid))
 
 @app.route("/cam/<cid>/addZone/success", methods=["POST"])
 def addZoneSuccess(cid):

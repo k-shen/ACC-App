@@ -133,7 +133,7 @@ def addVideo(cid):
 def addVideoSuccess(cid):
     #connect to data base
     video = flask.request.files['videofile']
-    vname = flask.request.form['vname']
+    vname = flask.request.form['vname'].replace(' ', '')
     vpath = os.path.join(app.config['UPLOAD_FOLDER'], vname)
     #video.save(os.path.join(app.config['UPLOAD_FOLDER'], vname))
 
@@ -146,6 +146,33 @@ def addVideoSuccess(cid):
 
     print("added video" + vname + " of camera id " + str(cid))
     return flask.redirect('/cam/{}'.format(cid))
+
+@app.route("/addCamera/drawbox", methods=['GET', "POST"])
+def addVideoDrawbox():
+    video = flask.request.files['videofile']
+    vname = flask.request.form['vname'].replace(' ', '')
+    cname = flask.request.files['cname'].replace(' ', '')
+    vpath = os.path.join(app.config['UPLOAD_FOLDER'], vname)
+    ci_name = cname + "_img.jpg"
+    ci_path = os.path.join(app.config['UPLOAD_FOLDER'], ci_name)
+    video.save(vpath)
+    get_image(vpath, ci_path)
+    print(vpath, ci_path)
+    
+    conn = sqlite.connect('./data/database.db')
+    c = conn.cursor()
+    c.execute('insert into Cameras (cam_name) values (?);', \
+        (cname))
+    cid = c.execute('SELECT last_insert_rowid()').fetchone()
+    c.execute("INSERT INTO Videos (video_name, cam_id, video_path) VALUES (?, ?, ?);", \
+        (vname, cid, vpath))
+    c.execute('insert into Zones (zone_name, cam_id, top_left_x, top_left_y, bot_right_x, bot_right_y) values (?, ?, ?, ?, ?, ?);', \
+        ('dummy', cid, 0, 0, 0, 0))
+    zid = c.execute('SELECT last_insert_rowid()').fetchone()
+    conn.commit()
+    conn.close()
+
+    return flask.redirect(url_for('drawZone', cid=cid, zid=zid, img_src=ci_path))
 
 @app.route("/addCamera", methods=['GET', "POST"])
 def addCamera():
@@ -187,11 +214,19 @@ def addZone(cid):
 
     return flask.render_template('redraw.html', cam=cam)
 
-@app.route("/cam/<cid>/<zid>/redraw")
-def drawZone(cid, zid):
-    return flask.render_template('image.html')
+@app.route("/cam/<cid>/<zid>/redraw/<img_src>", methods=['GET', "POST"])
+def drawZone(cid, zid, img_src):
+    conn = sqlite.connect('./data/database.db')
+    c = conn.cursor()
+    cam_info = (c.execute("select * from Cameras where cam_id=?",(cid,)).fetchone())
+    cam = loadTempCamera(cam_info)
+    if (img_src == 'None'):
+        cname = cam.name.replace(' ', '')
+        img_src = '/' + app.config['UPLOAD_FOLDER'] + '/' + cname + '_img.jpg'
+        print(img_src)
+    return flask.render_template('image.html', cam=cam, zid=zid, img_src=img_src)
 
-@app.route("/cam/<cid>/<zid>/redraw/success")
+@app.route("/cam/<cid>/<zid>/redraw/success", methods=['GET', "POST"])
 def drawZoneSuccess(cid, zid):
     # top_left_x = flask.request.form['top_left_x']
     # top_left_y = flask.request.form['top_left_y']
@@ -203,21 +238,19 @@ def drawZoneSuccess(cid, zid):
     
     return flask.redirect('/cam/{}'.format(cid))
 
-@app.route("/cam/<cid>/addZone/success", methods=["POST"])
-def addZoneSuccess(cid):
-    zname = flask.request.form['zname']
-    top_left_x = flask.request.form['top_left_x']
-    top_left_y = flask.request.form['top_left_y']
-    bot_right_x = flask.request.form['bot_right_x']
-    bot_right_y = flask.request.form['bot_right_y']
-    conn = sqlite.connect('./data/database.db')
-    c = conn.cursor()
-    c.execute('insert into Zones (zone_name, cam_id, top_left_x, top_left_y, bot_right_x, bot_right_y) values (?, ?, ?, ?, ?, ?);', \
-        (zname, cid, top_left_x, top_left_y, bot_right_x, bot_right_y))
-    conn.commit()
-    conn.close()
+#JOEY CHANGED FOR ZONES
+@app.route("/cam/<cid>/<zid>/success", methods=["GET","POST"])
+def addZoneSuccess(cid, zid):
+    if request.method == "POST":
+        coords = request.get_json()
+        top_left_x = coords[0]['topleftX']
+        top_left_y = coords[0]['topleftY']
+        bot_right_x = coords[0]['bottomrightX']
+        bot_right_y = coords[0]['bottomrightY']
+        print(coords)
 
-    return flask.redirect('/cam/{}'.format(cid))
+    return flask.redirect('/home/{}'.format(cid))
+    #return flask.redirect('/cam/{}'.format(cid))
 
 
 # @app.route("/cam/<cid>/draw", methods=['GET', "POST"])

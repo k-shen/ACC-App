@@ -37,7 +37,7 @@
                 {% for zone in zdata: %}
                     <div class="row"  name="{{zone.name}}">
                         <p class="row-label">{{ zone.name }}</p>
-                        <form action="/cam/{{cam.cam_id}}/{{zone.zone_id}}/redraw" style="display: inline;">
+                        <form action="/cam/{{cam.cam_id}}/{{zone.zone_id}}/redraw/{{None}}" style="display: inline;">
                             <input type="submit" value="Redraw" class="button"/>
                         </form>
                         <button zid="{{zone.zone_id}}" class="button delete-zone-button">delete</button>

@@ -18,7 +18,7 @@
             </a>
         </header>
         <div class="container">
-            <form action="/addCamera/success" method="POST" enctype="multipart/form-data">
+            <form action="/addCamera/drawbox" method="POST" enctype="multipart/form-data">
                 <div class="wrapper">
                     <p>Name for the new camera angle*:</p>
                     <input type="text" name="cname" placeholder="Name*" required>
@@ -26,13 +26,13 @@
                     <input type="file" id="image-upload" accept="*" name="videofile" required>
                     <p>Name for the video*:</p>
                     <input type="text" name="vname" placeholder="Name*" required>
-                    <p>Click to draw the interest area*:</p>
+                    <!-- <p>Click to draw the interest area*:</p>
                     <form action="/drawbox" style="display: inline;">
                         <input type="submit" value="draw" class="button"/>
-                    </form>
+                    </form> -->
                 </div>
                 <a class="button" href="/home" style="display: inline;">Back</a>
-                <button type="submit" class="button submit" style="display: inline;">Done</button>
+                <button type="submit" class="button submit" style="display: inline;">Draw box</button>
             </form>
         </div>
     </body>

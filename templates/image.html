@@ -14,10 +14,15 @@
 </head>
 <body>
     <div style="width:300px;">
-        <div><img src="/data/Obama.jpeg" alt="" /></div>
+        <div><img src="{{img_src}}" alt="" /></div>
         <div style="padding-top:20px;">
             <div id="coord"></div>
+            <div id="coord2"></div>
         </div>
+        <form class='finish_zone' action="/cam/{{cam.cam_id}}" method="POST" enctype="multipart/form-data">
+            <button type="submit" class="button submit" style="display: inline;">Done</button>
+            <a class="button" href="/cam/{{cam.cam_id}}/{{zid}}/redraw/None" style="display: inline;">Redo</a>
+        </form>
     </div>
 </body>
 </html>

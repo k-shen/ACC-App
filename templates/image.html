@@ -1,6 +1,6 @@
 <html>
 <head>
-    <title>X, Y Coordinates using jQuery</title>
+    <title>ACC</title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,15 +13,22 @@
     <title>ACC Home</title>
 </head>
 <body>
-    <div style="width:300px;">
-        <div><img src="{{img_src}}" alt="" /></div>
+    <div>
+        <div><img src="{{img_src}}" alt="" style="width:300px;height:300px;"/></div>
         <div style="padding-top:20px;">
             <div id="coord"></div>
             <div id="coord2"></div>
         </div>
-        <form class='finish_zone' action="/cam/{{cam.cam_id}}" method="POST" enctype="multipart/form-data">
-            <button type="submit" class="button submit" style="display: inline;">Done</button>
-            <a class="button" href="/cam/{{cam.cam_id}}/{{zid}}/redraw/None" style="display: inline;">Redo</a>
+        <form class='finish_zone' cid="{{cam.cam_id}}" zid="{{zid}}" action="/cam/{{cam.cam_id}}/{{zid}}/redraw/success" method="POST" enctype="multipart/form-data">
+            <div class="coords">
+                <input id="tlx" type="hidden" name="tlx">
+                <input id="tly" type="hidden"name="tly">
+                <input id="brx" type="hidden"name="brx">
+                <input id="bry" type="hidden"name="bry">
+            </div>
+
+            <button id="done_drawing" type="submit" class="button submit" style="display: inline;">Done</button>
+            <a class="button"  href="/cam/{{cam.cam_id}}/{{zid}}/redraw/None" style="display: inline;">Redo</a>
         </form>
     </div>
 </body>

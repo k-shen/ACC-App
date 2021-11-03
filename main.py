@@ -228,41 +228,18 @@ def drawZone(cid, zid, img_src):
 
 @app.route("/cam/<cid>/<zid>/redraw/success", methods=['GET', "POST"])
 def drawZoneSuccess(cid, zid):
-    # top_left_x = flask.request.form['top_left_x']
-    # top_left_y = flask.request.form['top_left_y']
-    # bot_right_x = flask.request.form['bot_right_x']
-    # bot_right_y = flask.request.form['bot_right_y']
-    # conn = sqlite.connect('./data/database.db')
-    # c = conn.cursor()
-    # c.execute("update Zones set top_left_x = ?, top_left_y = ?, bot_right_x = ?, bot_right_y = ? where zone_id =?",(top_left_x, top_left_y, bot_right_x, bot_right_y, zid,))
-    
+    top_left_x = flask.request.form['tlx']
+    top_left_y = flask.request.form['tly']
+    bot_right_x = flask.request.form['brx']
+    bot_right_y = flask.request.form['bry']
+    print(top_left_x, top_left_y, bot_right_x, bot_right_y)
+    conn = sqlite.connect('./data/database.db')
+    c = conn.cursor()
+    c.execute("update Zones set top_left_x = ?, top_left_y = ?, bot_right_x = ?, bot_right_y = ? where zone_id =?",(top_left_x, top_left_y, bot_right_x, bot_right_y, zid,))
+    conn.commit()
+    conn.close()
     return flask.redirect('/cam/{}'.format(cid))
 
-#JOEY CHANGED FOR ZONES
-@app.route("/cam/<cid>/<zid>/success", methods=["GET","POST"])
-def addZoneSuccess(cid, zid):
-    if request.method == "POST":
-        coords = request.get_json()
-        top_left_x = coords[0]['topleftX']
-        top_left_y = coords[0]['topleftY']
-        bot_right_x = coords[0]['bottomrightX']
-        bot_right_y = coords[0]['bottomrightY']
-        print(coords)
-
-    return flask.redirect('/home/{}'.format(cid))
-    #return flask.redirect('/cam/{}'.format(cid))
-
-
-# @app.route("/cam/<cid>/draw", methods=['GET', "POST"])
-# def redrawBox(cid):
-#     conn = sqlite.connect('./data/database.db')
-#     c = conn.cursor()
-#     cam_info = (c.execute("select * from Cameras where cam_id=?",(cid,)).fetchone())
-#     conn.commit()
-#     conn.close()
-#     cam = loadTempCamera(cam_info)
-
-#     return flask.render_template('redraw.html', cam=cam)
 
 @app.route("/cam/<cid>/draw_success", methods=['GET', "POST"])
 def redrawSuccess(cid):

@@ -40,9 +40,9 @@ function drawRectangles(X,Y,X2,Y2) {
 
     const ctx = canvas.getContext('2d');
 
-    ctx.fillStyle = 'blue';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
     ctx.strokeStyle = 'red';
-    ctx.lineWidth = 4.20;
+    ctx.lineWidth = 3;
     var fillRect = false;
     ctx.rect(X, Y, X2-X, Y2-Y);
     ctx.stroke();

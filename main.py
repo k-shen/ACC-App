@@ -205,6 +205,8 @@ def addVideoDrawbox():
     c.execute("INSERT INTO Videos (video_name, cam_id, video_path) VALUES (?, ?, ?);", \
         (vname, cid, vpath))
     c.execute('insert into Zones (zone_name, cam_id, top_left_x, top_left_y, bot_right_x, bot_right_y) values (?, ?, ?, ?, ?, ?);', \
+    ('Entire', cid, 0, 0, 0, 0 ))
+    c.execute('insert into Zones (zone_name, cam_id, top_left_x, top_left_y, bot_right_x, bot_right_y) values (?, ?, ?, ?, ?, ?);', \
         ('Enter Zone Name', cid, 0, 0, 0, 0 ))
     zid = c.execute('SELECT last_insert_rowid()').fetchone()[0]
     conn.commit()

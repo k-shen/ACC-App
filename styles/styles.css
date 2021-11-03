@@ -93,3 +93,31 @@ a.home:active {
 td {
     width: fit-content;
 }
+/** For drawing **/
+
+#container{
+    display:inline-block;
+    width:320px; 
+    height:480px;
+    margin: 0 auto; 
+    position:relative; 
+    border:5px solid black; 
+    border-radius: 10px; 
+    box-shadow: 0 5px 50px #333
+}
+    
+#gameCanvas1{
+    position:relative;
+}
+    
+#gameCanvas2{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 425px;
+    border: .1px solid rgba(255, 255, 255, 0.4);
+}
+#changeOpacity{
+    opacity: 0.8
+}

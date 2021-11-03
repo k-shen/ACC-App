@@ -170,8 +170,9 @@ def addVideoSuccess(cid):
     #connect to data base
     video = flask.request.files['videofile']
     vname = flask.request.form['vname'].replace(' ', '')
-    vpath = os.path.join(app.config['UPLOAD_FOLDER'], vname)
-    #video.save(os.path.join(app.config['UPLOAD_FOLDER'], vname))
+    vname_format = vname.replace(' ', '')
+    vpath = os.path.join(app.config['UPLOAD_FOLDER'], vname_format)
+    video.save(vpath)
 
     conn = sqlite.connect('./data/database.db')
     c = conn.cursor()
@@ -247,7 +248,7 @@ def query():
 def addZone(cid):
     conn = sqlite.connect('./data/database.db')
     c = conn.cursor()
-    cam_info = (c.execute("select * from Cameras where cam_id=?",(cid,)).fetchone())
+    #cam_info = (c.execute("select * from Cameras where cam_id=?",(cid,)).fetchone())
     c.execute('insert into Zones (zone_name, cam_id, top_left_x, top_left_y, bot_right_x, bot_right_y) values (?, ?, ?, ?, ?, ?);', \
         ('Enter Zone Name', cid, 0, 0, 0, 0))
     zid = c.execute('SELECT last_insert_rowid()').fetchone()[0]
@@ -284,23 +285,6 @@ def drawZoneSuccess(cid, zid):
     c.execute("update Zones set zone_name = ?, top_left_x = ?, top_left_y = ?, bot_right_x = ?, bot_right_y = ? where zone_id =?",(zname, top_left_x, top_left_y, bot_right_x, bot_right_y, zid,))
     conn.commit()
     conn.close()
-    return flask.redirect('/cam/{}'.format(cid))
-
-
-@app.route("/cam/<cid>/draw_success", methods=['GET', "POST"])
-def redrawSuccess(cid):
-    zname = flask.request.form['zname']
-    top_left_x = flask.request.form['top_left_x']
-    top_left_y = flask.request.form['top_left_y']
-    bot_right_x = flask.request.form['bot_right_x']
-    bot_right_y = flask.request.form['bot_right_y']
-    conn = sqlite.connect('./data/database.db')
-    c = conn.cursor()
-    c.execute('insert into Zones (zone_name, cam_id, top_left_x, top_left_y, bot_right_x, bot_right_y) values (?, ?, ?, ?, ?, ?);', \
-        (zname, cid, top_left_x, top_left_y, bot_right_x, bot_right_y))
-    conn.commit()
-    conn.close()
-
     return flask.redirect('/cam/{}'.format(cid))
 
 if __name__ == '__main__':

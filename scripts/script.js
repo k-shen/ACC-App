@@ -64,11 +64,14 @@ $(document).ready(function() {
 
     $("#adding").on('click', function() {
         var cid = $(this).attr("cid")
-        console.log(cid)
         if (document.getElementById('vid_table').style.display == 'none') {
             $('#adding').attr('action', "/cam/"+cid+"/addZone").submit();
         } else {
             $('#adding').attr('action', "/cam/"+cid+"/addVideo").submit();
         }
+    });
+    $("#drawzone").on('click', function() {
+        $(this).parent().submit();
+        $(this).prop('disabled', true);
     })
 });

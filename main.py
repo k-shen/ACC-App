@@ -5,6 +5,7 @@ from scripts.Camera import *
 from scripts.Video import Video
 from flask import request
 import os
+from scripts.get_frame import *
 
 
 app = flask.Flask(__name__, static_folder='')
@@ -17,7 +18,7 @@ app.config['SS_FOLDER'] = SS_FOLDER
 def home():
     return flask.redirect('/home')
 
-@app.route('/home', methods=['GET'])
+@app.route('/home', methods=['GET', 'POST'])
 def show():
     conn = sqlite.connect('./data/database.db')
     c = conn.cursor()
@@ -66,10 +67,14 @@ def deleteCam(cid):
     conn = sqlite.connect('./data/database.db')
     c = conn.cursor()
     idToDelete = request.form['cid']
-    cname = c.execute("select cam_name from Cameras where cam_id=?",(idToDelete,)).fetchone()
+    #massDeleteVideo(idToDelete)
+    cname = c.execute("select cam_name from Cameras where cam_id=?",(idToDelete,)).fetchone()[0]
     ci_name = cname.replace(' ', '') + "_img.jpg"
     ci_path = os.path.join(app.config['SS_FOLDER'], ci_name)
-    os.remove(ci_path)
+    try: 
+        os.remove(ci_path)
+    except:
+        FileNotFoundError()
     c.execute("delete from Cameras where cam_id=?",(idToDelete,))
     conn.commit()
     conn.close()
@@ -77,13 +82,27 @@ def deleteCam(cid):
     print("deleted camera id " + str(cid))
     return flask.redirect('/home')
 
+def massDeleteVideo(cid):
+    conn = sqlite.connect('./data/database.db')
+    c = conn.cursor()
+    videos = (c.execute("select video_id from Videos where cam_id=?",(cid,)).fetchall())
+    print(videos)
+    for i in videos:
+        deleteVid(i)
+
 @app.route('/vid/<vid>/delete', methods=['POST'])
 def deleteVid(vid):
-    #connect to data base
-    
     conn = sqlite.connect('./data/database.db')
     c = conn.cursor()
     idToDelete = request.form['vid']
+    vname = c.execute("select video_name from Videos where video_id=?",(idToDelete,)).fetchone()[0]
+    ci_name = vname.replace(' ', '')
+    ci_path = os.path.join(app.config['UPLOAD_FOLDER'], ci_name)
+    try: 
+        os.remove(ci_path)
+    except:
+        FileNotFoundError()
+    
     c.execute("delete from Videos where video_id=?",(idToDelete,))
     conn.commit()
     conn.close()
@@ -162,30 +181,31 @@ def addVideoSuccess(cid):
 @app.route("/addCamera/drawbox", methods=['GET', "POST"])
 def addVideoDrawbox():
     video = flask.request.files['videofile']
-    vname = flask.request.form['vname'].replace(' ', '')
-    cname = flask.request.files['cname'].replace(' ', '')
-    vpath = os.path.join(app.config['UPLOAD_FOLDER'], vname)
-    ci_name = cname.replace(' ', '') + "_img.jpg"
+    vname = flask.request.form['vname']
+    cname = flask.request.form['cname']
+    vname_format = vname.replace(' ', '')
+    cname_format = cname.replace(' ', '')
+    vpath = os.path.join(app.config['UPLOAD_FOLDER'], vname_format)
+    ci_name = cname_format.replace(' ', '') + "_img.jpg"
     ci_path = os.path.join(app.config['SS_FOLDER'], ci_name)
     video.save(vpath)
     get_image(vpath, ci_path)
     print(vpath, ci_path)
     
-    
     conn = sqlite.connect('./data/database.db')
     c = conn.cursor()
-    c.execute('insert into Cameras (cam_name) values (?);', \
-        (cname))
-    cid = c.execute('SELECT last_insert_rowid()').fetchone()
+    c.execute('insert into Cameras (cam_name) values (?);', (cname,))
+    cid = c.execute('SELECT last_insert_rowid()').fetchone()[0]
+    print(cid, vname, vpath)
     c.execute("INSERT INTO Videos (video_name, cam_id, video_path) VALUES (?, ?, ?);", \
         (vname, cid, vpath))
     c.execute('insert into Zones (zone_name, cam_id, top_left_x, top_left_y, bot_right_x, bot_right_y) values (?, ?, ?, ?, ?, ?);', \
-        ('dummy', cid, 0, 0, 0, 0))
-    zid = c.execute('SELECT last_insert_rowid()').fetchone()
+        ('Enter Zone Name', cid, 0, 0, 0, 0 ))
+    zid = c.execute('SELECT last_insert_rowid()').fetchone()[0]
     conn.commit()
     conn.close()
 
-    return flask.redirect(url_for('drawZone', cid=cid, zid=zid, img_src=ci_path))
+    return flask.redirect(url_for('drawZone', cid=cid, zid=zid, zname='Enter Zone Name', img_src='None'))
 
 @app.route("/addCamera", methods=['GET', "POST"])
 def addCamera():
@@ -223,13 +243,11 @@ def addZone(cid):
     cam_info = (c.execute("select * from Cameras where cam_id=?",(cid,)).fetchone())
     c.execute('insert into Zones (zone_name, cam_id, top_left_x, top_left_y, bot_right_x, bot_right_y) values (?, ?, ?, ?, ?, ?);', \
         ('Enter Zone Name', cid, 0, 0, 0, 0))
-    zid = c.execute('SELECT last_insert_rowid()').fetchone()
+    zid = c.execute('SELECT last_insert_rowid()').fetchone()[0]
+    print(zid)
     conn.commit()
     conn.close()
-    cam = loadTempCamera(cam_info)
-    img_src = getImgFromCam(cam)
-    
-    return flask.redirect(url_for('drawZone', cid=cid, zid=zid, img_src=img_src))
+    return flask.redirect(url_for('drawZone', cid=cid, zid=zid, zname='Enter Zone Name', img_src='None'))
 
 @app.route("/cam/<cid>/<zid>/redraw/<img_src>", methods=['GET', "POST"])
 def drawZone(cid, zid, img_src):
@@ -240,8 +258,10 @@ def drawZone(cid, zid, img_src):
     if (img_src == 'None'):
         img_src = getImgFromCam(cam)
         print(img_src)
-    zname = (c.execute("select zone_name from Zones where zone_id=?", (cid,)).fetchone())
+    zname = (c.execute("select zone_name from Zones where zone_id=?", (zid,)).fetchone())
     print(zname)
+    conn.commit()
+    conn.close()
     return flask.render_template('image.html', cam=cam, zid=zid, zname=zname[0], img_src=img_src)
 
 @app.route("/cam/<cid>/<zid>/redraw/success", methods=['GET', "POST"])

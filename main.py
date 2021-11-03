@@ -25,7 +25,6 @@ def show():
     all = (c.execute("select * from Cameras").fetchall())
     conn.commit()
     conn.close()
-
     cam_list = []
     for cam in all:
         cam_list.append(loadTempCamera(cam))
@@ -67,7 +66,7 @@ def deleteCam(cid):
     conn = sqlite.connect('./data/database.db')
     c = conn.cursor()
     idToDelete = request.form['cid']
-    #massDeleteVideo(idToDelete)
+    massDeleteVideo(idToDelete)
     cname = c.execute("select cam_name from Cameras where cam_id=?",(idToDelete,)).fetchone()[0]
     ci_name = cname.replace(' ', '') + "_img.jpg"
     ci_path = os.path.join(app.config['SS_FOLDER'], ci_name)
@@ -80,7 +79,7 @@ def deleteCam(cid):
     conn.close()
 
     print("deleted camera id " + str(cid))
-    return flask.redirect('/home')
+    return flask.redirect(url_for('home'))
 
 def massDeleteVideo(cid):
     conn = sqlite.connect('./data/database.db')
@@ -88,7 +87,14 @@ def massDeleteVideo(cid):
     videos = (c.execute("select video_id from Videos where cam_id=?",(cid,)).fetchall())
     print(videos)
     for i in videos:
-        deleteVid(i)
+        vname = c.execute("select video_name from Videos where video_id=?",(i[0],)).fetchone()[0]
+        
+        ci_name = vname.replace(' ', '')
+        ci_path = os.path.join(app.config['UPLOAD_FOLDER'], ci_name)
+        try: 
+            os.remove(ci_path)
+        except:
+            FileNotFoundError()
 
 @app.route('/vid/<vid>/delete', methods=['POST'])
 def deleteVid(vid):
@@ -102,7 +108,6 @@ def deleteVid(vid):
         os.remove(ci_path)
     except:
         FileNotFoundError()
-    
     c.execute("delete from Videos where video_id=?",(idToDelete,))
     conn.commit()
     conn.close()

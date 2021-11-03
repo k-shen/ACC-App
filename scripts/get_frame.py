@@ -32,7 +32,7 @@ def get_image(file_path, write_path):
                 return text_list
             except:
                 print("Easy OCR failed, but image write was successful, returning 0")
-                return 0
+                #return 0
 
 
 

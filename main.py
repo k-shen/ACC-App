@@ -9,7 +9,9 @@ import os
 
 app = flask.Flask(__name__, static_folder='')
 UPLOAD_FOLDER = './data/videos'
+SS_FOLDER = './data/cam_screen'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['SS_FOLDER'] = SS_FOLDER
 
 @app.route('/')
 def home():
@@ -34,6 +36,12 @@ def loadTempCamera(data):
     
     return cam
 
+def getImgFromCam(cam):
+    cname = cam.name.replace(' ', '')
+    img_src = '/' + app.config['SS_FOLDER'] + '/' + cname + '_img.jpg'
+    print(img_src)
+    print(os.path.exists(img_src[1:]))
+    return img_src
 
 def loadCameraObj(id):
     conn = sqlite.connect('./data/database.db')
@@ -58,6 +66,10 @@ def deleteCam(cid):
     conn = sqlite.connect('./data/database.db')
     c = conn.cursor()
     idToDelete = request.form['cid']
+    cname = c.execute("select cam_name from Cameras where cam_id=?",(idToDelete,)).fetchone()
+    ci_name = cname.replace(' ', '') + "_img.jpg"
+    ci_path = os.path.join(app.config['SS_FOLDER'], ci_name)
+    os.remove(ci_path)
     c.execute("delete from Cameras where cam_id=?",(idToDelete,))
     conn.commit()
     conn.close()
@@ -153,11 +165,12 @@ def addVideoDrawbox():
     vname = flask.request.form['vname'].replace(' ', '')
     cname = flask.request.files['cname'].replace(' ', '')
     vpath = os.path.join(app.config['UPLOAD_FOLDER'], vname)
-    ci_name = cname + "_img.jpg"
-    ci_path = os.path.join(app.config['UPLOAD_FOLDER'], ci_name)
+    ci_name = cname.replace(' ', '') + "_img.jpg"
+    ci_path = os.path.join(app.config['SS_FOLDER'], ci_name)
     video.save(vpath)
     get_image(vpath, ci_path)
     print(vpath, ci_path)
+    
     
     conn = sqlite.connect('./data/database.db')
     c = conn.cursor()
@@ -208,11 +221,15 @@ def addZone(cid):
     conn = sqlite.connect('./data/database.db')
     c = conn.cursor()
     cam_info = (c.execute("select * from Cameras where cam_id=?",(cid,)).fetchone())
+    c.execute('insert into Zones (zone_name, cam_id, top_left_x, top_left_y, bot_right_x, bot_right_y) values (?, ?, ?, ?, ?, ?);', \
+        ('Enter Zone Name', cid, 0, 0, 0, 0))
+    zid = c.execute('SELECT last_insert_rowid()').fetchone()
     conn.commit()
     conn.close()
     cam = loadTempCamera(cam_info)
-
-    return flask.render_template('redraw.html', cam=cam)
+    img_src = getImgFromCam(cam)
+    
+    return flask.redirect(url_for('drawZone', cid=cid, zid=zid, img_src=img_src))
 
 @app.route("/cam/<cid>/<zid>/redraw/<img_src>", methods=['GET', "POST"])
 def drawZone(cid, zid, img_src):
@@ -221,10 +238,11 @@ def drawZone(cid, zid, img_src):
     cam_info = (c.execute("select * from Cameras where cam_id=?",(cid,)).fetchone())
     cam = loadTempCamera(cam_info)
     if (img_src == 'None'):
-        cname = cam.name.replace(' ', '')
-        img_src = '/' + app.config['UPLOAD_FOLDER'] + '/' + cname + '_img.jpg'
+        img_src = getImgFromCam(cam)
         print(img_src)
-    return flask.render_template('image.html', cam=cam, zid=zid, img_src=img_src)
+    zname = (c.execute("select zone_name from Zones where zone_id=?", (cid,)).fetchone())
+    print(zname)
+    return flask.render_template('image.html', cam=cam, zid=zid, zname=zname[0], img_src=img_src)
 
 @app.route("/cam/<cid>/<zid>/redraw/success", methods=['GET', "POST"])
 def drawZoneSuccess(cid, zid):
@@ -232,10 +250,11 @@ def drawZoneSuccess(cid, zid):
     top_left_y = flask.request.form['tly']
     bot_right_x = flask.request.form['brx']
     bot_right_y = flask.request.form['bry']
+    zname = flask.request.form['zname']
     print(top_left_x, top_left_y, bot_right_x, bot_right_y)
     conn = sqlite.connect('./data/database.db')
     c = conn.cursor()
-    c.execute("update Zones set top_left_x = ?, top_left_y = ?, bot_right_x = ?, bot_right_y = ? where zone_id =?",(top_left_x, top_left_y, bot_right_x, bot_right_y, zid,))
+    c.execute("update Zones set zone_name = ?, top_left_x = ?, top_left_y = ?, bot_right_x = ?, bot_right_y = ? where zone_id =?",(zname, top_left_x, top_left_y, bot_right_x, bot_right_y, zid,))
     conn.commit()
     conn.close()
     return flask.redirect('/cam/{}'.format(cid))

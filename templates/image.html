@@ -14,21 +14,27 @@
 </head>
 <body>
     <div>
-        <div><img src="{{img_src}}" alt="" style="width:300px;height:300px;"/></div>
-        <div style="padding-top:20px;">
-            <div id="coord"></div>
-            <div id="coord2"></div>
+        <div>
+            <p>Click on the image to edit the coordinates for this zone <a class="button" href="/cam/{{cam.cam_id}}">Cancel</a></p>
+            
         </div>
-        <form class='finish_zone' cid="{{cam.cam_id}}" zid="{{zid}}" action="/cam/{{cam.cam_id}}/{{zid}}/redraw/success" method="POST" enctype="multipart/form-data">
-            <div class="coords">
-                <input id="tlx" type="hidden" name="tlx">
-                <input id="tly" type="hidden"name="tly">
-                <input id="brx" type="hidden"name="brx">
-                <input id="bry" type="hidden"name="bry">
+        
+        <div><img src="{{img_src}}" alt="" style="max-width:300px;max-height:300px;"/></div>
+        <br>
+        <form  cid="{{cam.cam_id}}" zid="{{zid}}" action="/cam/{{cam.cam_id}}/{{zid}}/redraw/success" method="POST" enctype="multipart/form-data">
+            <input id="zname" type="text" value="{{zname}}" name="zname">
+            <input id="tlx" type="hidden" name="tlx">
+            <input id="tly" type="hidden"name="tly">
+            <input id="brx" type="hidden"name="brx">
+            <input id="bry" type="hidden"name="bry">
+            <div style="padding-top:20px;">
+                <div id="coord"></div>
+                <div id="coord2"></div>
             </div>
-
-            <button id="done_drawing" type="submit" class="button submit" style="display: inline;">Done</button>
-            <a class="button"  href="/cam/{{cam.cam_id}}/{{zid}}/redraw/None" style="display: inline;">Redo</a>
+            <div class='finish_zone'>
+                <button id="done_drawing" type="submit" class="button submit" style="display: inline;">Done</button>
+            <a class="button" href="/cam/{{cam.cam_id}}/{{zid}}/redraw/None" style="display: inline;">Redo</a>
+            </div>
         </form>
     </div>
 </body>

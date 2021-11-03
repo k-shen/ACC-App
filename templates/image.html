@@ -10,17 +10,23 @@
     <script src="https://kit.fontawesome.com/d22acbefa1.js" crossorigin="anonymous"></script>
     <script src="{{ url_for('static',filename='scripts/script.js') }}"></script>
     <script src="{{ url_for('static',filename='scripts/image_click.js') }}"></script>
+    <link rel="stylesheet" href="styles/styles.css">
     <title>ACC Home</title>
 </head>
 <body>
-    <div>
+        <div>
+            <div id="gameCanvas1">
+                <canvas  id="canvas"  height="400" width="500">
+                </canvas>
+            </div>
+            <div id="gameCanvas2">
+                <img id="changeOpacity" src="{{img_src}}"  alt="" />
+            </div>
+        <br>
         <div>
             <p>Click on the image to edit the coordinates for this zone <a class="button" href="/cam/{{cam.cam_id}}">Cancel</a></p>
             
         </div>
-        
-        <div><img src="{{img_src}}" alt="" style="max-width:300px;max-height:300px;"/></div>
-        <br>
         <form  cid="{{cam.cam_id}}" zid="{{zid}}" action="/cam/{{cam.cam_id}}/{{zid}}/redraw/success" method="POST" enctype="multipart/form-data">
             <input id="zname" type="text" value="{{zname}}" name="zname">
             <input id="tlx" type="hidden" name="tlx">
@@ -36,6 +42,5 @@
             <a class="button" href="/cam/{{cam.cam_id}}/{{zid}}/redraw/None" style="display: inline;">Redo</a>
             </div>
         </form>
-    </div>
 </body>
 </html>

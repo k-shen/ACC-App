@@ -11,7 +11,6 @@ $(document).ready(function() {
             var X2 = (e.pageX - offset.left);
             var Y2 = (e.pageY - offset.top);
             $('#coord2').text('X2: ' + X2 + ', Y2: ' + Y2);
-            
             var coords = [
                 {
                     'bottomrightX': X2,
@@ -20,6 +19,7 @@ $(document).ready(function() {
                     'topleftY': Y,
                 }
             ]
+            drawRectangles(X,Y,X2,Y2);
             var cid = $('.finish_zone').attr('cid');
             var zid = $('.finish_zone').attr('zid');
             $('.finish_zone').show();
@@ -30,3 +30,21 @@ $(document).ready(function() {
         });
     });
 });
+
+function drawRectangles(X,Y,X2,Y2) {
+    const canvas = document.querySelector('#canvas');
+
+    if (!canvas.getContext) {
+        return;
+    }
+
+    const ctx = canvas.getContext('2d');
+
+    ctx.fillStyle = 'blue';
+    ctx.strokeStyle = 'red';
+    ctx.lineWidth = 4.20;
+    var fillRect = false;
+    ctx.rect(X, Y, X2-X, Y2-Y);
+    ctx.stroke();
+
+}
